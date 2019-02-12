@@ -1,0 +1,24 @@
+server:
+  port: 9202
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    healthcheck:
+      enabled: true
+    serviceUrl:
+      defaultZone: http://172.16.0.104:8761/eureka/
+spring:
+  application:
+    name: test-ribbon2
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+#设置Hystrix turbine监控数据，通过例如http://my.turbine.server:8080/turbine.stream?cluster=CLUSTERNAME控制集群，默认是default
+#turbine:
+#  aggregator:
+#    cluster-config: CUSTOMERS,USER
+#可以使用/clusters来看集群端点
+#可以配置 Turbine Stream（不作详细记录）

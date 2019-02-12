@@ -1,0 +1,47 @@
+server:
+  port: 9991
+spring:
+  application:
+    name: test-netflix #程序名称，注册Eureka的时候会使用该名称
+eureka:
+  instance:
+#Eureka实例ID，默认是${spring.cloud.client.hostname}:${spring.application.name}:${spring.application.instance_id:${server.port}}}，Cloud Foundry中vcap.application.instance_id会自动在Spring Boot应用程序中填充，因此不需要随机值
+#    instanceId: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
+  #状态页面和运行情况的话，使用非默认上下文路径或者servlet，比如server:servletPath=/custom:，则需要下面的设置，这些连接显示在客户端的数据中，并在某些情况下用于决定是否想你的应用程序发送请求，如果正确，有很大帮助
+#    status-page-url-path: ${server.servletPath}/info #状态页面，默认为/info
+#    health-check-url-path: ${server.servletPath}/health #运行状况，默认为/health
+#如果希望使用https来使用你的来接触你的应用，则设置下面两个标识,同样，以这种方式配置时，Spring Cloud DiscoveryClient始终返回URI https，Eureka（本机），实例信息距有安全的运行状况检查URL
+#    non-secure-port-enabled: false
+#    secure-port-enabled: true
+#设置了上面两种参数，由于Eureka在内部的工作方式，依然会发布非安全URL的状态和主页，除非你明确覆盖这些URL，你可以配置:
+#    status-page-url: https://${eureka.hostname}/info
+#    health-check-url: https://${eureka.hostname}/health
+#    home-page-url: https://${eureka.hostname}/
+#注意，${eureka:hostname} 在Eureka高版本的可用的本机占位符，同样，可以使用Spring的占位符${eureka.instance.hostName}
+#如果你的应用程序在代理后面运行，并且SSL终止在代理中，你需要确保代理"转发"表头呗截获和处理通过申请，如果Tomcat有 'X-Forwarded-\*` 表头的显式配置，则会自动发生这种情况。你的应用程序呈现给自己错误的连接（错误的主机，端口或协议）表明你的配置错误
+#    metadata-map: #实例和客户端的Eureka元数据在，（一般不常用）
+  client:
+    #Eureka的健康检查，默认情况下，Eureka使用客户端心跳来确定客户端是否启动，除非另有说明，否则Discovery Client不会根据Spring Boot Actuator传播应用程序的当前状况检查状态，成功注册后，Eureka始终宣布应用程序处于UP状态，通过启用Eureka运行状况检查可以更改此行为，从而将应用程序状态传播到Eureka。因此，每个应用程序都不会向UP以外状态下的应用程序发送流量
+    healthcheck:
+      enabled: true #只能设置在application.yml，设置在bootstrap.yml会导致不良副作用，会在Eureka中注册UNKNOWN状态，如果需要更多控制健康检查，可以实现com.netflix.appinfo.HealthCheckHandler
+    serviceUrl:
+#      defaultZone: http://localhost:8761/eureka/ #向Eureka服务器注册，如果需要验证，则如下格式http://user:password@localhost:8761/eureka
+      defaultZone: http://172.16.0.100:8761/eureka/ #向Eureka服务器注册，如果需要验证，则如下格式http://user:password@localhost:8761/eureka
+
+
+#如果Eureka Discovery Client 开关
+#eureka.client.enabled=false
+
+#备注
+#如果身份验证过于复杂，则创建一个DiscoveryClientOptionalArgs的@Bean并注入ClientFilter
+#由于Eureka的限制，无法支持每台服务器的基本身份验证，因此只能找到第一个集合
+#在各种情况下使用Eureka，如Cloud Foundry，AWS
+#为什么注册服务那么慢，是因为作为失礼还涉及到注册表（通过客户端serviceUrl）的定期心跳，默认持续时间30秒。可以通过设置eureka.instance.leaseRenewalIntervalInSeconds来修改小于30的值会加快使客户端连接到其它服务的过程，但是在生产中，最好使用默认值，因为服务武器中的内部计算会对租赁续订期做出假设。
+#可以设置区域，可以更改metadataMap属性来执行此操作
+#Service 1 in Zone 1
+#eureka.instance.metadataMap.zone = zone1
+#eureka.client.preferSameZoneEureka = true
+
+#Service 1 in Zone 2
+#eureka.instance.metadataMap.zone = zone2
+#eureka.client.preferSameZoneEureka = true

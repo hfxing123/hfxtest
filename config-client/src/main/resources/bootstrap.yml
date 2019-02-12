@@ -1,0 +1,71 @@
+# 和git里的文件名对应
+spring:
+  cloud:
+    config:
+      label: master # 远程仓库的分支,可以是git标签，分支名称，或者提交ID，可以逗号分隔，会逐个尝试，直到成功为止
+      profile: dev # dev 开发环境配置文件 |  test 测试环境  |  pro 正式环境
+      uri: http://localhost:8090/  # 指明配置服务中心的网址，可以逗号隔开，但是如果返回401或者500则认为是请求是成功，认为是用户问题而不是可用性问题，就用该链接。仅当在指定每个url嵌入凭证，否则不可能支持所有身份验证和授权（详见说明1）
+      name: config-client # 和git里的文件名对应，可以逗号配置多个（不配置的话，就是${spring.application.name}）
+  application:
+    name: config-client # 程序名称，不要加保留字application-
+  profiles:
+    active: dev,mysql
+
+
+
+#快速失败，如果想找不到配置库启动不了就开启
+#spring.cloud.config.fail-fast=true
+
+#配置读取超时时间
+#spring.cloud.config.request-read-timeout
+
+#如果配置了快速失败，可以设置重试
+#spring.cloud.config.retry.*
+
+#可以开启关闭健康监控
+#health.config.enabled=false
+#health.config.time-to-live=1000（毫秒为单位）
+
+
+#（说明1）登录的账号密码可以以下面的形式设置
+#spring:
+#    cloud:
+#      config:
+#       uri: https://user:secret@myconfig.mycompany.com
+#或者，设置的username和password会覆盖链接里面的账号密码
+#spring:
+#    cloud:
+#      config:
+#       uri: https://myconfig.mycompany.com
+#       username: user
+#       password: secret
+#或者在Cloud Foundry的情况，会有这样的连接
+#spring:
+#    cloud:
+#      config:
+#       uri: ${vcap.services.configserver.credentials.uri:http://user:password@localhost:8888}
+
+#Config Service提供/{name}/{profile}/{label}的属性源，客户端默认的数据
+#"name" = ${spring.application.name}
+#"profile" = ${spring.profiles.active} (actually Environment.getActiveProfiles())
+#"label" = "master"
+
+#备注
+#可以自定义RestTemplate
+#使用Vault的情况有说明，但是略过
+#可以使用DiscoveryClient实现，设置spring.cloud.config.discovery.enabled=true，如Eureka需要配置eureka.client.serviceUrl.defaultZone，默认的配置服务器ID是configserver，可以设置spring.cloud.config.discovery.serviceId来设置该ID，好处就是直接根据服务ID来获取数据，服务器的该ID，使用spring.application.name来设置
+#eureka:
+#  instance:
+#    ...
+#    metadataMap:
+#      user: osufhalskjrtl
+#      password: lviuhlszvaorhvlo5847
+#      configPath: /config
+
+
+
+
+
+
+
+
